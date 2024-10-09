@@ -1,23 +1,10 @@
 use common.nu *
 
-export def 'todo scratch' [
-    id?:int
-    --nth(-n):int=0
-    --type(-t):string='txt'
-    --output(-o)
-] {
-    if $output {
-
-    } else {
-        if ($id | is-empty) {
-            scratch-new --type $type
-        } else {
-
-        }
-    }
+def cmpl-scratch-id [] {
+    run $"select id as value, title as description from scratch order by updated desc;"
 }
 
-export def scratch-new [--type(-t): string] {
+export def scratch-add [--type(-t): string] {
     let now = date now | fmt-date
     let input = $"" | block-edit $"scratch-XXX.($type)" | lines
     let d = {
@@ -32,7 +19,13 @@ export def scratch-new [--type(-t): string] {
         returning id;"
 }
 
-export def scratch-edit [id --type(-t):string] {
+export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string] {
+    let id = if ($id | is-empty) {
+        run $"select id from scratch order by updated desc limit 1;"
+        | get 0.id
+    } else {
+        $id
+    }
     let old = run $"select title, type, content from scratch where id = ($id);"
     let type = if ($type | is-empty) { $old.type | first } else { $type }
     let input = [...$old.title ...$old.content]
@@ -49,9 +42,15 @@ export def scratch-edit [id --type(-t):string] {
         $"($k) = (Q $v)"
     }
     | str join ','
-    run $"update scratch set ($d);"
+    run $"update scratch set ($d) where id = ($id);"
 }
 
-export def scratch-out [id] {
+export def scratch-out [id?:int@cmpl-scratch-id] {
+    let id = if ($id | is-empty) {
+        run $"select id from scratch order by updated desc limit 1;"
+        | get 0.id
+    } else {
+        $id
+    }
     run $"select content from scratch where id = ($id);" | get 0.content
 }
