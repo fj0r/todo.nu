@@ -77,12 +77,17 @@
         - [x] When no tag is specified, `:untagged` is added by default. #59
         - [x] remove/add `:untagged` when todo tag #60
     - [x] Tips about initializing the database #239
-- [x] Integration #63
+- [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
         - [x] Interactive cleaning :trash `tclean` #224
-    - [x] Import/Export(TODO.md) #69
+    - [ ] Import/Export(TODO.md) #69
         - [x] Export json #242
+        - [ ] Import #243
+            - [ ] id collision #245
+            - [ ] Restore tag #246
+            - [ ] Mounting Node (Parent) #247
+            - [ ] Maintain the tree structure #248
     - [x] Shortcut #70
     - [x] Todo Commit #76
         - [x] Fill in the #todo in the README.md file #64
