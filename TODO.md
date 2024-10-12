@@ -16,7 +16,7 @@
     - [ ] List unfinished tasks, sorted by deadline #214
     - [x] Allows setting a specified tag to be hidden. #223
         - [x] Add column `hidden` #280
-        - [x] "Filter category where `hidden` is true when querying." #281
+        - [x] Filter category where `hidden` is true when querying. #281
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
