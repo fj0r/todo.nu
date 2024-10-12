@@ -208,8 +208,8 @@ export def todo-list [
     --created: duration
     --deadline: duration
     --sort(-s): list<string@cmpl-sort>
-    --unfinished(-n)
-    --finished(-f)
+    --work-in-process(-W)
+    --finished(-F)
     --untagged(-U)
     --md(-m)
     --md-list(-l)
