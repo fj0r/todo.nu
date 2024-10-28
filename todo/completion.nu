@@ -9,7 +9,7 @@ export def cmpl-level [] {
 }
 
 export def cmpl-del-level [] {
-    [tag category]
+    [tag]
 }
 
 export def cmpl-sort [] {
@@ -26,25 +26,13 @@ export def cmpl-todo-id [] {
     | each { $"($in.id) # ($in.title)" }
 }
 
-export def cmpl-tag-id [] {
-    run 'select id, name from tag;'
-    | each { $"($in.id) # ($in.name)" }
-}
-
 export def cmpl-tag [] {
-    run 'select name from tag;'
-    | get name
+    run $"(tag-tree) select * from tags" | get name
+
 }
 
-export def cmpl-cat [] {
-    run $"select id as value, name || '(char tab)' || hidden as description from category"
-}
-
-export def cmpl-category [] {
-    run 'select c.name as category, t.name as tag
-        from category as c
-        join tag as t on t.category_id = c.id'
-    | each { $"($in.category):($in.tag)" }
+export def cmpl-tag-id [] {
+   run $"(tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
 }
 
 export def cmpl-todo-md [] {
