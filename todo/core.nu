@@ -74,14 +74,18 @@ export def todo-add [
     mut tag = $tag | default []
     # Inheriting tags when child nodes are added
     if ($parent | is-not-empty) {
-        let t = run $"select category.name || ':' || tag.name as tag from todo join todo_tag on todo.id = todo_tag.todo_id join tag on todo_tag.tag_id = tag.id join category on tag.category_id = category.id where todo.id = ($parent)"
-        | get tag
+        let t = run $"(tag-tree) select tags.name
+        from todo join todo_tag on todo.id = todo_tag.todo_id
+        join tags on todo_tag.tag_id = tags.id
+        where todo.id = ($parent)"
+        | get name
         $tag ++= $t
     }
     if ($tag | is-not-empty) {
         for id in $ids {
-            let children = $tag | split-cat | cat-to-tag-id $id
-            run $"insert into todo_tag ($children);"
+            run $"(tag-tree) insert into todo_tag
+            select ($id) as todo_id, tags.id as tag_id
+            from tags where tags.name in \(($tag | each { Q $in } | str join ', ')\);"
         }
     }
 
@@ -259,13 +263,13 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
-    let tidq = "select t1.id from tag as t0 join tag as t1 on t1.parent_id = t0.id"
-    let tidq_filter_trash = "t0.name = '' and t1.name = 'trash'"
+    let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
+    let tidq_filter_trash = "tags.name = ':trash'"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
-        [true true] => $"todo.id not in \(($tidq) where t0.hidden\)"
+        [true true] => $"todo.id not in \(($tidq) where tags.hidden\)"
         [false false] => $"todo.id not in \(($tidq) where ($tidq_filter_trash)\)"
-        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or t0.hidden\)"
+        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or tags.hidden\)"
     }
 
     if ($tags | is-not-empty) {
