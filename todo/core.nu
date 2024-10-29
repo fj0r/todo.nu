@@ -273,14 +273,21 @@ export def todo-list [
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
     let include_untagged = "tags.hidden is null"
+    dbg $debug [$all ($tags | is-empty) $untagged] -t cond
     $cond ++= match [$all ($tags | is-empty) $untagged] {
-        [false true true] => $"($exclude_trash_todo_id) and \(($exclude_tags_hidden) or ($include_untagged)\)"
+        # --untagged
+        [false true true] => $"($exclude_trash_todo_id) and ($include_untagged)"
         [false true false] => $"($exclude_trash_todo_id) and ($exclude_tags_hidden)"
         [false false true] => $"($exclude_trash_todo_id) and ($include_untagged)"
+        # tag
         [false false false] => $"($exclude_trash_todo_id)"
+        # --all --untagged
         [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
+        # --all
         [true true false] => $exclude_tags_hidden
+        # --all [ --untagged tag ]
         [true false true] => $include_untagged
+        # --all tag
         [true false false] => "true"
     }
 
